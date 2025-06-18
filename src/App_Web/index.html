@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es-ar">
+<head>
+    <meta charset="UTF-8"> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENU</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const links = document.querySelectorAll(".presentacion__comidas__link");
+        const cuentaButton = document.getElementById("pedirCuenta");
+
+        links.forEach(link => {
+            link.addEventListener("click", (event) => {
+                event.preventDefault();
+
+                const mesa = document.getElementById("mesa").value;
+                if (!mesa) {
+                    alert("Por favor, ingrese el número de mesa.");
+                    return;
+                }
+
+                const comida = event.currentTarget.querySelector("img").alt;
+
+                fetch("http://192.XXX.X.XXX:5000/orden", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mesa, comida })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(`Orden enviada: Mesa ${data.mesa}, Comida: ${data.comida}`);
+                    document.getElementById("mesa").value = "";
+                    window.location.href = event.currentTarget.href;
+                })
+                .catch(error => console.error("Error al enviar la orden:", error));
+            });
+        });
+
+        // Agregar el evento al botón "Pedir Cuenta"
+        cuentaButton.addEventListener("click", () => {
+            const mesa = document.getElementById("mesa").value;
+            if (!mesa) {
+                alert("Por favor, ingrese el número de mesa.");
+                return;
+            }
+
+            fetch("http://192.XXX.X.XXX:5000/orden", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mesa, comida: "Cuenta" })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(`Solicitud enviada: Mesa ${data.mesa} pidió la cuenta.`);
+                document.getElementById("mesa").value = "";
+            })
+            .catch(error => console.error("Error al enviar la solicitud de cuenta:", error));
+        });
+    });
+</script>
+
+<body>
+    <main class="menu">
+        <section class="presentacion__contenido">
+            <h1 class="presentacion__contenido__titulo">MENU</h1>
+
+            <label for="mesa">Ingrese su número de mesa:</label>
+            <input type="number" id="mesa" min="1" required>
+
+            <div class="presentacion__comidas">
+                <h2 class="presentacion__comidas__subtitulo">Seleccione una opción del Menú:</h2>
+                <a class="presentacion__comidas__link" href="comidas/hamburguesa.html">
+                    <img src="./assets/Hamburguesa.png" alt="Hamburguesa">
+                </a>
+                <a class="presentacion__comidas__link" href="comidas/pizza.html">
+                    <img src="./assets/Pizza.png" alt="Pizza">
+                </a>
+                <a class="presentacion__comidas__link" href="comidas/fideos.html">
+                    <img src="./assets/Fideos.png" alt="Fideos">
+                </a>
+            </div> 
+
+            <!-- Botón para pedir la cuenta -->
+            <div class="pedir-cuenta">
+                <h2 class="presentacion__comidas__subtitulo">¿Desea pedir la cuenta?</h2>
+                <button id="pedirCuenta">Pedir Cuenta</button>
+            </div>
+        </section>      
+    </main>
+    <footer class="footer">
+        <p>UNRN - Laboratorio de Sistemas Embebidos</p>
+    </footer>
+</body>
+</html>
